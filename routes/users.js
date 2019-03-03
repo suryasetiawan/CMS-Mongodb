@@ -2,7 +2,6 @@ var express = require('express');
 var router = express.Router();
 const User = require('../models/user');
 const config = require('../config/config');
-// const helpers = require('../helpers/util');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
@@ -41,7 +40,7 @@ const jwt = require('jsonwebtoken');
 //   }
 // })
 
-router.post('/api/users/register', (req, res) => {
+router.post('/register', (req, res) =>{
   User.find({
       email: req.body.email
     })
@@ -153,7 +152,7 @@ router.post('/api/users/register', (req, res) => {
 //   }).catch(err => console.log(err))
 // })
 
-router.post('/api/users/login', (req, res) => {
+router.post('/login', (req, res) => {
   User.findOne({
     email: req.body.email,
   })
@@ -189,7 +188,7 @@ router.post('/api/users/login', (req, res) => {
 
 
 
-router.post('/api/users/check', (req, res) => {
+router.post('/check', (req, res) => {
   var token = req.body.token || req.query.token || req.header['x-access-token'];
   if (token) {
     jwt.verify(token, config.secret, (err, decoded) => {
@@ -213,7 +212,7 @@ router.post('/api/users/check', (req, res) => {
   }
 })
 
-router.get('/api/users/destroy', (req, res) => {
+router.get('/destroy', (req, res) => {
   res.json({
     logout: true
   })

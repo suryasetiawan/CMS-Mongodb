@@ -7,6 +7,7 @@ const mongoose = require('mongoose');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
+const dataRouter = require('./routes/data');
 
 var app = express();
 
@@ -30,8 +31,11 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/', usersRouter);
-app.use('/users', indexRouter);
+app.use('/', indexRouter);
+app.use('/api/users', usersRouter);
+app.use('/api/data', dataRouter);
+// app.use('/api/datadate', datadateRouter);
+// app.use('/api/maps', mapsRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
