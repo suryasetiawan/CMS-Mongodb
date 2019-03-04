@@ -1,9 +1,9 @@
 var express = require('express');
 var router = express.Router();
-const Data = require('../models/data');
-// const config = require('../config/config');
+const Datadate = require('../models/datadate');
+const moment = require('moment');
 
-// 1. BROWSE
+// 1. SEARCH
 router.post('/search', (req, res) => {
     let keyword = {};
     if (req.body.letter) {
@@ -12,42 +12,45 @@ router.post('/search', (req, res) => {
     if (req.body.frequency) {
         keyword.frequency = req.body.frequency
     }
-
-    Data.find(keyword).then(data1 => {
-        res.json(data1);
-    }).catch(err => {
-        res.json({
-            error: true,
-            message: err.message
+    Datadate.find(keyword).then(datadate1 => {
+        let data = [];
+        datadate1.forEach(item => {
+            data.push({
+                _id: item._id,
+                letter: moment(item.letter).format("YYYY-MM-DD"),
+                frequency: item.frequency
+            })
         })
+        res.json(data);
     })
-
 })
 
 // 2. READ
 router.get('/', (req, res) => {
-    Data.find().then(data1 => {
-        res.json(data1);
-    }).catch(err => {
-        json({
-            error: true,
-            message: `something went wrong : ${err.message}`
+    Datadate.find().then(datadate1 => {
+        let data = [];
+        datadate1.forEach(item => {
+            data.push({
+                _id: item._id,
+                letter: moment(item.letter).format("YYYY-MM-DD"),
+                frequency: item.frequency
+            })
         })
+        res.json(data);
     })
-
 })
 
 // 3. EDIT
-router.put('/:id', (req, res, next) => {
+router.put('/:id', function (req, res, next) {
     let id = req.params.id;
-    Data.findByIdAndUpdate(id, {
+    Datadate.findByIdAndUpdate(id, {
         letter: req.body.letter,
         frequency: req.body.frequency
-    }, { new: true }).then(data => {
-        if (!data) {
+    }, { new: true }).then(datadate => {
+        if (!datadate) {
             res.json({
                 success: false,
-                message: `updating data has been failed id : ${id} not found`,
+                message: `updating datadate has been failed id : ${id} not found`,
                 data: {
                     _id: null,
                     letter: null,
@@ -57,48 +60,47 @@ router.put('/:id', (req, res, next) => {
         } else {
             res.json({
                 success: true,
-                message: 'data has been updated',
+                message: 'datadate has been updated',
                 data: {
-                    _id: data._id,
-                    letter: data.letter,
-                    frequency: data.frequency
+                    _id: datadate._id,
+                    letter: moment(datadate.letter).format("YYYY-MM-DD"),
+                    frequency: datadate.frequency
                 }
             })
         }
     }).catch(err => {
         res.json({
             success: false,
-            message: 'updating data has been failed',
+            message: "updating datadate has been failed",
             data: {
-                _id: data._id,
-                letter: data.letter,
-                frequency: data.frequency
+                _id: null,
+                letter: null,
+                frequency: null
             }
         })
     })
-
 })
 
 // 4. ADD
 router.post('/', (req, res) => {
-    let data = new Data({
+    let datadate = new Datadate({
         letter: req.body.letter,
         frequency: req.body.frequency
     })
-    data.save().then(data1 => {
+    datadate.save().then(datadate1 => {
         res.json({
             success: true,
-            message: "data has been added",
+            message: 'datadate have been added',
             data: {
-                _id: data1._id,
-                letter: data1.letter,
-                frequency: data1.frequency
+                _id: datadate1._id,
+                letter: moment(datadate1.letter).format("YYYY-MM-DD"),
+                frequency: datadate1.frequency
             }
         })
     }).catch(err => {
         res.json({
             success: false,
-            message: "adding data has been failed",
+            message: 'adding datadate has been failed',
             data: {
                 _id: null,
                 letter: null,
@@ -111,21 +113,21 @@ router.post('/', (req, res) => {
 // 5. DELETE
 router.delete('/:id', (req, res, next) => {
     let id = req.params.id;
-    Data.findByIdAndRemove(id).then(data => {
-        if (data) {
+    Datadate.findByIdAndRemove(id).then(datadate => {
+        if (datadate) {
             res.json({
                 success: true,
-                message: 'data has been deleted',
+                message: 'datadate has been deleted',
                 data: {
-                    _id: data._id,
-                    letter: data.letter,
-                    frequency: data.frequency
+                    _id: datadate._id,
+                    letter: moment(datadate.letter).format("YYYY-MM-DD"),
+                    frequency: datadate.frequency
                 }
             })
         } else {
             res.json({
                 success: false,
-                message: `deleting data has been failed id : ${id}`,
+                message: `deleting datadate has been failed id : ${id}`,
                 data: {
                     _id: null,
                     letter: null,
@@ -136,7 +138,7 @@ router.delete('/:id', (req, res, next) => {
     }).catch(err => {
         res.json({
             success: false,
-            message: 'deleting data has been failed ',
+            message: 'deleting datadate has been failed',
             data: {
                 _id: null,
                 letter: null,
@@ -147,23 +149,23 @@ router.delete('/:id', (req, res, next) => {
 })
 
 // 6. FIND
-router.get('/:id', (req, res, next) => {
+router.get('/:id', function (req, res, next) {
     let id = req.params.id;
-    Data.findById(id).then(data => {
-        if (data) {
+    Datadate.findById(id).then(datadate => {
+        if(datadate){
             res.json({
                 success: true,
-                message: 'data found',
+                message: 'datadate found',
                 data: {
-                    _id: data._id,
-                    letter: data.letter,
-                    frequency: data.frequency
+                    _id: datadate._id,
+                    letter: moment(datadate.letter).format("YYYY-MM-DD"),
+                    frequency: datadate.frequency
                 }
             })
-        } else {
+        }else {
             res.json({
                 success: false,
-                message: `data with id : ${id} not found`,
+                message: `datadate with id : ${id} not found`,
                 data: {
                     _id: null,
                     letter: null,
@@ -174,7 +176,7 @@ router.get('/:id', (req, res, next) => {
     }).catch(err => {
         res.json({
             success: false,
-            message: 'data not found',
+            message: 'datadate not found',
             data: {
                 _id: null,
                 letter: null,
